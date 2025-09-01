@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,64 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: "California Wellness" (Light Sand, Muted Seafoam Green, Deep Slate, Subtle Peach Accent) -->
-    <!-- Application Structure Plan: The application is designed as a single-page dashboard with a fixed sidebar navigation. This structure was chosen over a linear slideshow format to empower the user with non-linear exploration. Users can immediately access the most relevant information—be it market data, consumer psychology, or the final strategic plan—without sequential constraints. This thematic grouping (Overview, Market, Consumer, Competition, Strategy) enhances usability by organizing complex information into logical, digestible sections, facilitating a deeper and more personalized analysis of the report's content. Key interactions include dynamic chart rendering for market data, tabbed interfaces for comparing demographics, and interactive cards for exploring trends, all designed to make the data more engaging and memorable. -->
-    <!-- Visualization & Content Choices: 
-        1. Market Growth Data -> Goal: Show Change -> Viz: Bar Chart -> Interaction: Hover for tooltips with exact values -> Justification: A bar chart is the most effective way to visually compare market valuations across regions and show projected growth over time. -> Library: Chart.js (Canvas).
-        2. Sub-Market Trends -> Goal: Show Proportions/Key Drivers -> Viz: Styled KPI Cards -> Interaction: Static Display -> Justification: Using clear, bold cards for the key sub-trends (Low-Sugar, Organic, Functional) makes these powerful market drivers immediately apparent and easy to grasp without needing a complex chart. -> Library/Method: HTML/Tailwind.
-        3. Generational Deep Dive -> Goal: Compare Segments -> Viz: Tabbed Interface -> Interaction: Click tabs to switch content -> Justification: Tabs allow for a clean, direct comparison of different consumer cohorts (Gen Z, Millennials, etc.) within a compact space, preventing information overload. -> Library/Method: HTML/JS.
-        4. Go-to-Market Strategy -> Goal: Show Process/Timeline -> Viz: Vertical Timeline Diagram -> Interaction: Static visual flow -> Justification: A visual timeline is more intuitive and engaging for presenting a phased rollout strategy than a simple bulleted list, clearly delineating the stages of the plan. -> Library/Method: HTML/Tailwind.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF7; /* Light Sand */
-            color: #334155; /* Deep Slate */
-        }
-        .nav-link {
-            transition: all 0.2s ease-in-out;
-            border-left: 3px solid transparent;
-        }
-        .nav-link.active {
-            background-color: #F0F5F4; /* Lighter Seafoam */
-            color: #2F6B60; /* Darker Seafoam */
-            border-left-color: #2F6B60; /* Darker Seafoam */
-        }
-        .nav-link:hover {
-            background-color: #F0F5F4;
-            color: #2F6B60;
-            border-left-color: #2F6B60;
-        }
-        .kpi-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            border: 1px solid #E2E8F0;
-        }
-        .tab-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .tab-button.active {
-            background-color: #2F6B60; /* Darker Seafoam */
-            color: white;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 400px;
-            max-height: 50vh;
-        }
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 300px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="flex min-h-screen">
     <aside class="w-64 bg-white shadow-md fixed h-full hidden lg:block">
@@ -295,135 +240,6 @@
         </div>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.content-section');
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        navLinks.forEach(link => {
-                            link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`);
-                        });
-                    }
-                });
-            }, { rootMargin: "-50% 0px -50% 0px" });
-
-            sections.forEach(section => {
-                observer.observe(section);
-            });
-
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetSection = document.querySelector(targetId);
-                    
-                    sections.forEach(section => {
-                        section.classList.add('hidden');
-                    });
-                    
-                    if (targetSection) {
-                        targetSection.classList.remove('hidden');
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                    
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Initial setup to show the first section
-            sections.forEach((section, index) => {
-                if (index !== 0) {
-                    section.classList.add('hidden');
-                } else {
-                    section.classList.remove('hidden');
-                }
-            });
-
-            // Tab functionality for Consumer Insights
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    const tabId = button.getAttribute('data-tab');
-                    tabContents.forEach(content => {
-                        content.classList.toggle('hidden', content.id !== tabId);
-                    });
-                });
-            });
-
-
-            // Chart.js implementation
-            const marketData = {
-                labels: ['Global', 'North America', 'United States'],
-                datasets: [
-                    {
-                        label: '2024 Market Value (USD B)',
-                        data: [149.75, 69.54, 48.68],
-                        backgroundColor: '#A7C7C1', // Muted Seafoam
-                        borderColor: '#2F6B60',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    },
-                    {
-                        label: 'Projected Market Value (USD B)',
-                        data: [248.51, null, 93.07], // North America projection not given
-                        backgroundColor: '#F3A68B', // Subtle Peach
-                        borderColor: '#D98263',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                    }
-                ]
-            };
-
-            const chartCtx = document.getElementById('marketGrowthChart').getContext('2d');
-            const marketGrowthChart = new Chart(chartCtx, {
-                type: 'bar',
-                data: marketData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += '$' + context.parsed.y + 'B';
-                                    }
-                                    const projectionYear = context.label === 'Global' ? '2030' : '2034';
-                                    if(context.dataset.label.includes('Projected')) {
-                                        label += ` (by ${projectionYear})`;
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Value in USD Billions'
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
